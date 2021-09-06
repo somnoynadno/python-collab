@@ -1,0 +1,23 @@
+version: "3"
+
+services:
+  backend:
+    build: backend
+    ports:
+      - 7777:8000
+    restart: always
+    networks:
+      - default
+
+  frontend:
+    build: frontend
+    env_file:
+      - frontend/.env
+    ports:
+      - 6666:3000
+    restart: always
+    networks:
+      - default
+
+networks:
+  default:
