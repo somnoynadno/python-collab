@@ -18,15 +18,21 @@ interface ParamTypes {
 function StudentClassPage() {
     let {id} = useParams<ParamTypes>();
 
-    const [sourceCode, setSourceCode] = useState("");
+    let lastCode = localStorage.getItem("source_code");
+    if (!lastCode) lastCode = "";
+
+    const [sourceCode, setSourceCode] = useState(lastCode);
     const [output, setOutput] = useState("");
     const [executionTime, setExecutionTime] = useState(0.0);
     const [isError, setIsError] = useState(false);
     const [lockRun, setLockRun] = useState(false);
 
-    const [name, setName] = useState("");
-    const [tempName, setTempName] = useState("");
-    const [isModalVisible, setIsModalVisible] = useState(true);
+    let savedName = localStorage.getItem("name");
+    if (!savedName) savedName = "";
+
+    const [name, setName] = useState(savedName);
+    const [tempName, setTempName] = useState(savedName);
+    const [isModalVisible, setIsModalVisible] = useState(!savedName);
     const [lastSentCode, setLastSentCode] = useState("");
 
     const [teacher, setTeacher] = useState(new Payload());
@@ -69,7 +75,7 @@ function StudentClassPage() {
             // @ts-ignore
             clearInterval(timer.current);
         };
-    })
+    });
 
     useEffect(() => {
         if (!name) {
@@ -117,7 +123,7 @@ function StudentClassPage() {
         window.Sk.pre = "output";
         // @ts-ignore
         Sk.configure({output: out});
-        let start = performance.now()
+        let start = performance.now();
         // @ts-ignore
         let myPromise = window.Sk.misceval.asyncToPromise(function () {
             // @ts-ignore
@@ -148,6 +154,7 @@ function StudentClassPage() {
                closable={false} cancelText={null} onOk={() => {
             setName(tempName);
             setIsModalVisible(false);
+            localStorage.setItem("name", tempName);
         }}>
             <Input onChange={(event) => setTempName(event.target.value)} placeholder="Имя Фамилия"/>
         </Modal>
@@ -161,10 +168,12 @@ function StudentClassPage() {
                     theme="github"
                     onChange={(value => {
                         setSourceCode(value);
+                        localStorage.setItem("source_code", value);
                     })}
                     fontSize={16}
                     name="editor"
                     editorProps={{$blockScrolling: true}}
+                    defaultValue={sourceCode}
                 />
                 <br/>
                 <Button disabled={lockRun} id="run" onClick={run} type="primary" style={{marginBottom: 24}}>
