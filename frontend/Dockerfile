@@ -1,6 +1,5 @@
 # Stage 1 - the build process
-FROM node:14.15.0-alpine3.12 as builder
-MAINTAINER "Alexander Zorkin"
+FROM node:16 as builder
 
 WORKDIR /app
 COPY package.json package-lock.json ./
@@ -11,12 +10,11 @@ COPY . ./
 RUN npm run build
 
 # Stage 2 - release
-FROM node:14.15.0-alpine3.12 as release
+FROM nginx:1.19.0
 
-WORKDIR /app
-COPY --from=builder /app/build ./build
+WORKDIR /usr/share/nginx/html
 
-RUN npm -g install serve
+RUN rm -rf ./*
+COPY --from=builder /app/build .
 
-CMD ["serve", "-s", "build", "-p", "3000"]
-EXPOSE 3000
+ENTRYPOINT ["nginx", "-g", "daemon off;"]

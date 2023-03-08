@@ -1,5 +1,4 @@
-FROM golang:latest
-LABEL maintainer="Alexander Zorkin"
+FROM golang:1-alpine
 
 RUN mkdir /app
 ADD . /app/

@@ -14,7 +14,7 @@ services:
     env_file:
       - frontend/.env
     ports:
-      - 6666:3000
+      - 6666:80
     restart: always
     networks:
       - default
