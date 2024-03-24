@@ -1,12 +1,17 @@
 package server
 
 import (
+    "fmt"
 	"github.com/gorilla/mux"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 	log "github.com/sirupsen/logrus"
 	"net/http"
 	"python-collab/backend/server/middleware"
 )
+
+func healthcheckHandler(w http.ResponseWriter, r *http.Request) {
+    fmt.Fprintf(w, "OK")
+}
 
 func initRouter() *mux.Router {
 	hubs := map[string]*Hub{}
@@ -32,6 +37,9 @@ func initRouter() *mux.Router {
 	})
 
 	r.Handle("/metrics", promhttp.Handler())
+
+	r.HandleFunc("/system/readiness", healthcheckHandler).Methods("GET")
+	r.HandleFunc("/system/liveness", healthcheckHandler).Methods("GET")
 
 	r.Use(middleware.CORS)    // enable CORS headers
 	r.Use(middleware.LogPath) // log IP, path and method
